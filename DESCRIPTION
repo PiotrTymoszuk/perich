@@ -1,0 +1,30 @@
+Package: perich
+Type: Package
+Title: Permutation Enrichment Testing for Binary Data
+Version: 0.1.0
+Author: Piotr Tymoszuk <piotr.s.tymoszuk@gmail.com>
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: The package offers an enrichment test for differences in frequencies of 
+    binary variables such as genetic alterations alterations in two or more 
+    analysis groups. The test simulates expected frequencies of features of 
+    interest taking into account general alteration rates in the observations. 
+    As such it is expected to be immune to the IID assumption required e.g. by 
+    Fisher's exact test.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+LazyDataCompression: bzip2
+Authors@R: c(
+    person("Piotr", "Tymoszuk", , "piotr.s.tymoszuk@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-0398-6034"))
+  )
+Imports: 
+    furrr,
+    future,
+    purrr,
+    Rcpp (>= 1.0.10),
+    stats
+LinkingTo: 
+    Rcpp 
+RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
