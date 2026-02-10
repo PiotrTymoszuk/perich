@@ -1,10 +1,20 @@
 # perich
-Permutation Enrichment Testing for Binary Data
+_Permutation Enrichment Testing for Binary Data_
 
 ## A bigger picture
 
-Many statistical tools like Fisher's exact and $\chi^2$ test or logistic regression used for comparison of binary information between some analysis groups assume independent and identical distributions (IID). This assumption may be severely violated in many biological data sets such as genetic alterations in cancer samples. In this particular example, it not hard to imagine that mutations, amplifications and deletions may arise at overall rated that differ deeply between cancers. In particular, in cancers with genetically unstable phenotype, e.g. due to inactivation of DNA repair mechanisms or cell cycle checkpoints, many genetic alterations may simply arise by chance. 
-Tools of `perich` package try to overcome the IID assumption by weighted permutation testing, i.e. comparision of the actual rates of a binary event (e.g. presence of a mutation) with N radom reshuffles of the binary event vector. By default, the permutation weights or probability of an event for an observation equal to the overall event rate for all available binary variables. In our practical example of genetic alterations, the weights correspond to the fraction of mutated genes in the cancer samples.
+Many statistical tools like Fisher's exact and $\chi^2$ test or logistic regression used for 
+comparison of binary information between some analysis groups assume independent and identical distributions (IID). 
+This assumption may be severely violated in many biological data sets such as genetic alterations in cancer samples. 
+In this particular example, it not hard to imagine that mutations, amplifications and deletions may arise at overall rates 
+that differ deeply between cancers.
+In particular, in cancers with genetically unstable phenotype, e.g. due to inactivation of DNA repair mechanisms or 
+cell cycle checkpoints, many genetic alterations may simply arise by chance. 
+Tools of `perich` package try to overcome the IID assumption by weighted permutation testing, i.e. comparison of the actual 
+rates of a binary event (e.g. presence of a mutation) with N random reshuffles of the binary event vector. 
+By default, the permutation weights or probability of an event for an observation equal to the overall event rate 
+for all available binary variables. 
+In our practical example of genetic alterations, the weights correspond to the fraction of mutated genes in the cancer samples.
 
 ## Installation
 
@@ -30,8 +40,15 @@ Many thanks to authors, maintainers and contributors of [Rcpp](https://www.rcpp.
 
 ## Basic usage
 
-As noted above, weighted permutation testing may be especially useful at analysis of binary genetic data, e.g. comparison of mutation frequency between analysis groups or enrichment in of somatic mutations in an analysis group that is unlikely attributed to random differences in overall mutation rates between cancer samples. 
-`perich` package comes with two publicly available somatic mutation data sets of urothelial cancers, the TCGA BLCA and IMvigor cohort. Here, we will test for non-accidental enrichment of somatic mutations in three molecular clusters (publication pending!!!). The mutation data are 0/1-coded, where 0 denotes a wild-type (WT) variant of a gene and 1 codes for presence of at least one somatic mutation. Rows represent cancer samples, genes are stored in columns:
+As noted above, weighted permutation testing may be especially useful at analysis of binary genetic data, 
+e.g. comparison of mutation frequency between analysis groups or enrichment in of somatic mutations in 
+an analysis group that is unlikely attributed to random differences in overall mutation rates between cancer samples. 
+`perich` package comes with two publicly available somatic mutation data sets of urothelial cancers, 
+the TCGA BLCA and IMvigor cohort. 
+Here, we will test for non-accidental enrichment of somatic mutations in [three molecular clusters](https://github.com/PiotrTymoszuk/BLCA-cluster-paper). 
+The mutation data are 0/1-coded, where 0 denotes a wild-type (WT) variant of a gene and 1 codes for presence of 
+at least one somatic mutation. 
+Rows represent cancer samples, genes are stored in columns:
 
 ```r
   ## R packages
@@ -68,16 +85,20 @@ TCGA-4Z-AA7O-01       #3    0    0   0     0       0      0     0    0    0
 TCGA-4Z-AA7Q-01       #2    0    0   0     0       0      0     0    0    0
 ```
 
-For the analysis, a background object is required. It is recommended to provide a matrix of all available binary variables as a background object. In our case, the background objects will be simply 0/1 mutations for all genes measured in cancer cohorts. Additionally, a group-defining factor is required. We are going to assess enrichment for genes with mutations in at least 2.5% of cancer samples in each cohort.
+For the analysis, a background object is required. 
+It is recommended to provide a matrix of all available binary variables as a background object. 
+In our case, the background objects will be simply 0/1 mutations for all genes measured in cancer cohorts. 
+Additionally, a group-defining factor is required, in our case a vector with molecular subset labels. 
+We are going to assess enrichment for genes with mutations in at least 2.5% of cancer samples in each cohort.
 
 ```r
-  ## a numeric matrices with binary indices for all mutations
+  ## numeric matrices with binary indices for all mutations
 
   background <- data %>%
     map(select, -clust_id) %>%
     map(as.matrix)
 
-  ## a group assignment vectors
+  ## group assignment vectors
 
   g <- data %>%
     map(~.x$clust_id)
@@ -94,7 +115,12 @@ For the analysis, a background object is required. It is recommended to provide 
 
 ```
 
-To test for enrichment in the molecular clusters, we are calling `perTest()` function. In a fist step, we are checking for rates of mutations in the tumor suppressor gene _TP53_. The function takes a binary vector with the binary variable of interest, the group-defining factor `f`, a `background` object as obligatory arguments. The user is welcome to adjust numbers of algorithm iterations, type of confidence intervals or testing alternative (both by default: both enrichment and dpletion in the clusters will be investigated):
+To test for enrichment in the molecular clusters, we are calling `perTest()` function. 
+In a fist step, we are checking for rates of mutations in the tumor suppressor gene _TP53_. 
+The function takes a binary vector with the binary variable of interest, 
+the group-defining factor `f`, a `background` object as obligatory arguments.
+The user is welcome to adjust numbers of algorithm iterations, type of confidence intervals or 
+testing alternative (both by default: both enrichment and depletion in the clusters will be investigated):
 
 ```r
 
@@ -114,9 +140,17 @@ strata2     #2 1.2939231 1.119403 1.5306122   0.001         74     57.312     11
 strata3     #3 0.8029207 0.718750 0.9078947   0.002         68     85.226     169 7.854945  2 0.0984757     0.01969339
 
 ```
-The effect size of enrichment in the clusters is measured by an enrichment score `ES`, which is an Laplace smoother-corrected ratio of the observed to the expected event counts obtained by weighted permutations. The `ES` is returned with 95% confidence intervals and a p value for enrichment for the clusters. The `chisq`, `df`, and `global_p_value` of the output refer to a slightly modified Pearson's $\chi^2$ test for differences in mutation frequency between the clusters. Cramer's V statistic measures the effect size of such global differences in event rates. 
+The effect size of enrichment in the clusters is measured by an enrichment score `ES`, 
+which is an Laplace smoother-corrected ratio of the observed to the expected event counts obtained by weighted permutations. 
+The `ES` is returned with 95% confidence intervals and a p value for enrichment for the clusters. 
+The `chisq`, `df`, and `global_p_value` of the output refer to a slightly modified Pearson's $\chi^2$ test 
+for differences in mutation frequency between the clusters. 
+Cramer's V statistic measures the effect size of such global differences in event rates. 
 
-`perTest()` function accepts also a binary matrix as the first argument. In our example, if a matrix or a data frame with 0/1-coded mutations is provided, each of the columns is treated as a separate variable. By setting `compress = TRUE`, the output will be coerced to a single data frame. `adj_method` allows for specifying a multiple testing adjustment method: 
+`perTest()` function accepts also a binary matrix as the first argument. 
+In our example, if a matrix or a data frame with 0/1-coded mutations is provided, each of the columns is treated as 
+a separate variable. By setting `compress = TRUE`, the output will be coerced to a single data frame. 
+`adj_method` allows for specifying a multiple testing adjustment method (Benjamini-Hochberg in our case): 
 
 ```r
 perTest(data$imvigor[, genes$imvigor[1:10]],
@@ -148,7 +182,8 @@ head
 6     0.67674619 0.55777778         0.8459327
 
 ```
-Finally, by calling a parallel backend via `future()`, we make the function run in parallel, which enables a 'genome-wide' analysis: 
+Finally, by calling a parallel backend via `future()`, we make the function run in parallel, 
+which enables a 'genome-wide' analysis: 
 
 ```r
 

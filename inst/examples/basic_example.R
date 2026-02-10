@@ -22,13 +22,15 @@
 
 # preparing objects for testing -------
 
-  ## a numeric matrices with binary indices for all mutations
+  ## numeric matrices with binary indices for all mutations,
+  ## they'll serve as backgrounds for estimating expacted rates of
+  ## alterations occuring at random
 
   background <- data %>%
     map(select, -clust_id) %>%
     map(as.matrix)
 
-  ## a group assignment vectors
+  ## group assignment vectors
 
   g <- data %>%
     map(~.x$clust_id)
@@ -47,6 +49,7 @@
 
   set.seed(12345)
 
+  ## testing for enrichment with input vectors with NAs:
   ## any NA values are silently removed
 
   tricky_vec <- data$tcga$FGFR3
@@ -86,7 +89,7 @@
           alternative = 'both',
           as_data_frame = TRUE)
 
-  ## background provided as a numeric vector: zeos are not allowed!
+  ## background provided as a numeric vector: zeros are not allowed!
 
   perTest(data$tcga$FGFR3,
           f = g$tcga,
@@ -133,7 +136,7 @@
           compress = TRUE,
           adj_method = 'BH')
 
-  ## parallel run fors all genes of interest
+  ## parallel run for all genes of interest
 
   enrichment <- list()
 
@@ -166,7 +169,6 @@
   enrichment <- enrichment %>%
     map(mutate,
         log_ES = log(ES),
-        global_significant = ifelse(global_p_value < 0.01, 'yes', 'no'),
         status = ifelse(p_value >= 0.01, 'ns',
                         ifelse(log_ES > 0, 'enriched',
                                ifelse(log_ES < 0, 'depleted', 'ns'))),

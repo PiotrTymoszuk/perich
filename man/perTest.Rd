@@ -236,7 +236,8 @@ It may be provided in three forms:
 \itemize{
 \item as a numeric vector, whose length corresponds to the number of observations.
 This option may be used when the user intends to used pre-computed
-observation weights such as total mutation burden
+observation weights such as total mutation burden. Zero and negative values
+are not allowed.
 \item as a binary numeric matrix, i.e. matrix that contains 0 and 1 values only.
 Features are represented by the columns, observations are represented by
 the rows
